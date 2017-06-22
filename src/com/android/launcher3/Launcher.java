@@ -2642,17 +2642,15 @@ public class Launcher extends Activity
         }
 
         String pickerPackage = getString(R.string.wallpaper_picker_package);
-        if (TextUtils.isEmpty(pickerPackage)) {
-            pickerPackage =  PackageManagerHelper.getWallpaperPickerPackage(getPackageManager());
-        }
-
         int pageScroll = mWorkspace.getScrollForPage(mWorkspace.getPageNearestToCenterOfScreen());
         float offset = mWorkspace.mWallpaperOffset.wallpaperOffsetForScroll(pageScroll);
 
         setWaitingForResult(new PendingRequestArgs(new ItemInfo()));
-        Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER)
-                .setPackage(pickerPackage)
-                .putExtra(Utilities.EXTRA_WALLPAPER_OFFSET, offset);
+        Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
+        if (PackageManagerHelper.isAppEnabled(getPackageManager(), pickerPackage)) {
+            intent.setPackage(pickerPackage);
+        }
+        intent.putExtra(Utilities.EXTRA_WALLPAPER_OFFSET, offset);
         intent.setSourceBounds(getViewBounds(v));
         startActivityForResult(intent, REQUEST_PICK_WALLPAPER, getActivityLaunchOptions(v));
     }
@@ -2664,7 +2662,7 @@ public class Launcher extends Activity
     public void onClickSettingsButton(View v) {
         if (LOGD) Log.d(TAG, "onClickSettingsButton");
         Intent intent = new Intent(Intent.ACTION_APPLICATION_PREFERENCES)
-                .setPackage(getPackageName());
+               //.setPackage(getPackageName());
         intent.setSourceBounds(getViewBounds(v));
         startActivity(intent, getActivityLaunchOptions(v));
     }
